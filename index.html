@@ -1,0 +1,408 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>XNEON OSINT</title>
+<meta name="description" content="XNEON OSINT — Open Source Intelligence research and resources.">
+<link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90' fill='%2300e5ff'>X</text></svg>">
+<style>
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  :root {
+    --bg: #07090f;
+    --panel: #0d1220;
+    --panel-2: #111828;
+    --border: #1c2538;
+    --text: #d7dde8;
+    --muted: #6b7a94;
+    --accent: #00e5ff;
+    --accent-2: #00ff9d;
+    --danger: #ff3860;
+  }
+  html { scroll-behavior: smooth; }
+  body {
+    font-family: "SF Mono", "Menlo", "Consolas", "Courier New", monospace;
+    background: var(--bg);
+    color: var(--text);
+    line-height: 1.6;
+    min-height: 100vh;
+    background-image:
+      radial-gradient(circle at 20% 10%, rgba(0,229,255,0.08), transparent 40%),
+      radial-gradient(circle at 80% 60%, rgba(0,255,157,0.06), transparent 40%),
+      linear-gradient(rgba(0,229,255,0.03) 1px, transparent 1px),
+      linear-gradient(90deg, rgba(0,229,255,0.03) 1px, transparent 1px);
+    background-size: auto, auto, 40px 40px, 40px 40px;
+  }
+  a { color: var(--accent); text-decoration: none; }
+  a:hover { color: var(--accent-2); }
+
+  .wrap { max-width: 960px; margin: 0 auto; padding: 0 20px; }
+
+  /* ---------- Header ---------- */
+  header {
+    padding: 22px 0;
+    border-bottom: 1px solid var(--border);
+    position: sticky;
+    top: 0;
+    background: rgba(7,9,15,0.85);
+    backdrop-filter: blur(8px);
+    z-index: 10;
+  }
+  header .wrap {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 14px;
+  }
+  .logo {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    font-weight: 700;
+    letter-spacing: 1px;
+    font-size: 15px;
+    color: var(--text);
+  }
+  .logo .mark {
+    width: 30px; height: 30px;
+    display: flex; align-items: center; justify-content: center;
+    border: 1px solid var(--accent);
+    border-radius: 6px;
+    color: var(--accent);
+    font-size: 16px;
+    box-shadow: 0 0 12px rgba(0,229,255,0.25);
+  }
+  .logo .name .os { color: var(--accent); }
+  nav { display: flex; gap: 18px; font-size: 13px; }
+  nav a { color: var(--muted); }
+  nav a:hover { color: var(--accent); }
+
+  /* ---------- Hero ---------- */
+  .hero {
+    padding: 72px 0 56px;
+    text-align: left;
+    position: relative;
+  }
+  .prompt {
+    color: var(--accent);
+    font-size: 13px;
+    margin-bottom: 16px;
+    opacity: 0.9;
+  }
+  .prompt::before { content: "> "; color: var(--accent-2); }
+  h1 {
+    font-size: clamp(36px, 9vw, 76px);
+    font-weight: 800;
+    letter-spacing: -1px;
+    line-height: 1;
+    margin-bottom: 20px;
+  }
+  h1 .xneon {
+    color: var(--text);
+  }
+  h1 .osint {
+    color: var(--accent);
+    text-shadow: 0 0 24px rgba(0,229,255,0.35);
+  }
+  .tagline {
+    font-size: 15px;
+    color: var(--muted);
+    max-width: 540px;
+    margin-bottom: 28px;
+  }
+  .tagline strong { color: var(--text); font-weight: 600; }
+  .cta {
+    display: inline-flex;
+    gap: 10px;
+    flex-wrap: wrap;
+  }
+  .btn {
+    display: inline-block;
+    padding: 11px 20px;
+    border-radius: 8px;
+    font-size: 13px;
+    font-weight: 600;
+    letter-spacing: 0.3px;
+    border: 1px solid transparent;
+    transition: all 0.15s;
+    cursor: pointer;
+    font-family: inherit;
+  }
+  .btn-primary {
+    background: var(--accent);
+    color: #001a20;
+    border-color: var(--accent);
+  }
+  .btn-primary:hover { background: var(--accent-2); border-color: var(--accent-2); color: #001a10; }
+  .btn-ghost {
+    background: transparent;
+    color: var(--text);
+    border-color: var(--border);
+  }
+  .btn-ghost:hover { border-color: var(--accent); color: var(--accent); }
+
+  /* ---------- Sections ---------- */
+  section { padding: 56px 0; border-top: 1px solid var(--border); }
+  .section-head {
+    display: flex;
+    align-items: baseline;
+    gap: 12px;
+    margin-bottom: 28px;
+  }
+  .section-head h2 {
+    font-size: 20px;
+    font-weight: 700;
+    letter-spacing: 0.5px;
+  }
+  .section-head .num {
+    color: var(--accent);
+    font-size: 12px;
+    letter-spacing: 1px;
+  }
+
+  .grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
+    gap: 14px;
+  }
+  .card {
+    background: var(--panel);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    padding: 20px;
+    transition: border-color 0.15s, transform 0.15s, background 0.15s;
+    position: relative;
+    overflow: hidden;
+  }
+  .card::before {
+    content: "";
+    position: absolute;
+    top: 0; left: 0;
+    width: 100%; height: 2px;
+    background: linear-gradient(90deg, var(--accent), var(--accent-2));
+    opacity: 0;
+    transition: opacity 0.15s;
+  }
+  .card:hover {
+    border-color: #2a3a56;
+    background: var(--panel-2);
+    transform: translateY(-2px);
+  }
+  .card:hover::before { opacity: 1; }
+  .card h3 {
+    font-size: 14px;
+    font-weight: 700;
+    margin-bottom: 6px;
+    letter-spacing: 0.3px;
+  }
+  .card p {
+    font-size: 12.5px;
+    color: var(--muted);
+    line-height: 1.55;
+  }
+  .card .tag {
+    display: inline-block;
+    margin-top: 12px;
+    font-size: 10.5px;
+    letter-spacing: 0.6px;
+    color: var(--accent);
+    background: rgba(0,229,255,0.08);
+    border: 1px solid rgba(0,229,255,0.2);
+    padding: 2px 8px;
+    border-radius: 4px;
+    text-transform: uppercase;
+  }
+
+  /* ---------- About block ---------- */
+  .about-text {
+    max-width: 640px;
+    color: var(--muted);
+    font-size: 14px;
+  }
+  .about-text p { margin-bottom: 14px; }
+  .about-text strong { color: var(--text); }
+
+  /* ---------- Contact ---------- */
+  .contact-row {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px;
+  }
+  .contact-row a {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    padding: 10px 16px;
+    background: var(--panel);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    font-size: 12.5px;
+    color: var(--text);
+    transition: border-color 0.15s, color 0.15s;
+  }
+  .contact-row a:hover { border-color: var(--accent); color: var(--accent); }
+  .contact-row a::before { content: "›"; color: var(--accent); }
+
+  /* ---------- Footer ---------- */
+  footer {
+    border-top: 1px solid var(--border);
+    padding: 24px 0 32px;
+    font-size: 11.5px;
+    color: var(--muted);
+    display: flex;
+    justify-content: space-between;
+    flex-wrap: wrap;
+    gap: 8px;
+  }
+  footer .right { color: #3d4a63; }
+  footer .dot {
+    display: inline-block;
+    width: 6px; height: 6px;
+    background: var(--accent-2);
+    border-radius: 50%;
+    margin-right: 6px;
+    box-shadow: 0 0 6px var(--accent-2);
+    animation: pulse 2s infinite;
+  }
+  @keyframes pulse {
+    0%, 100% { opacity: 1; }
+    50% { opacity: 0.4; }
+  }
+
+  @media (max-width: 600px) {
+    nav { display: none; }
+    .hero { padding: 48px 0 40px; }
+    section { padding: 40px 0; }
+  }
+</style>
+</head>
+<body>
+
+<header>
+  <div class="wrap">
+    <div class="logo">
+      <div class="mark">X</div>
+      <div class="name">XNEON<span class="os">&nbsp;OSINT</span></div>
+    </div>
+    <nav>
+      <a href="#about">about</a>
+      <a href="#tools">tools</a>
+      <a href="#contact">contact</a>
+    </nav>
+  </div>
+</header>
+
+<main class="wrap">
+
+  <section class="hero" style="border-top:none">
+    <div class="prompt">initializing xneon.osint</div>
+    <h1>
+      <span class="xneon">XNEON</span><br>
+      <span class="osint">OSINT</span>
+    </h1>
+    <p class="tagline">
+      <strong>Open Source Intelligence.</strong>
+      Investigating the publicly available. Documenting the overlooked.
+      Everything on this page is public information, sourced openly and
+      shared for research and education.
+    </p>
+    <div class="cta">
+      <a href="#tools" class="btn btn-primary">View tools</a>
+      <a href="#contact" class="btn btn-ghost">Get in touch</a>
+    </div>
+  </section>
+
+  <section id="about">
+    <div class="section-head">
+      <span class="num">01</span>
+      <h2>About</h2>
+    </div>
+    <div class="about-text">
+      <p>
+        <strong>XNEON OSINT</strong> is a small research project focused on
+        open source intelligence — the practice of collecting and analysing
+        information that is already publicly available: social media,
+        public records, metadata, archived pages, and the countless small
+        traces the internet leaves behind.
+      </p>
+      <p>
+        The goal is not surveillance. It's understanding what is already
+        visible, and helping people understand what they themselves are
+        sharing. Everything here is legal, ethical, and reversible.
+      </p>
+      <p>
+        <em>Edit this section to describe yourself and your project.</em>
+      </p>
+    </div>
+  </section>
+
+  <section id="tools">
+    <div class="section-head">
+      <span class="num">02</span>
+      <h2>Tools &amp; Resources</h2>
+    </div>
+    <div class="grid">
+      <div class="card">
+        <h3>Link Tracer</h3>
+        <p>Trace a social media share link back to its source metadata — timestamps, device, and sharer IDs from public parameters.</p>
+        <span class="tag">tool</span>
+      </div>
+      <div class="card">
+        <h3>Username Recon</h3>
+        <p>Check whether a username exists on hundreds of public platforms. Fully open source, no login required.</p>
+        <span class="tag">tool</span>
+      </div>
+      <div class="card">
+        <h3>Metadata Viewer</h3>
+        <p>Inspect EXIF and document metadata in any uploaded file — right in the browser, nothing leaves your device.</p>
+        <span class="tag">tool</span>
+      </div>
+      <div class="card">
+        <h3>Archive Search</h3>
+        <p>Search archived versions of pages that may no longer be live. Public archive only.</p>
+        <span class="tag">resource</span>
+      </div>
+      <div class="card">
+        <h3>Reading List</h3>
+        <p>Curated books, papers, and articles on OSINT methodology and ethics.</p>
+        <span class="tag">resource</span>
+      </div>
+      <div class="card">
+        <h3>Contact</h3>
+        <p>Questions, corrections, or collaboration — reach out via any link below.</p>
+        <span class="tag">open</span>
+      </div>
+    </div>
+  </section>
+
+  <section id="contact">
+    <div class="section-head">
+      <span class="num">03</span>
+      <h2>Contact</h2>
+    </div>
+    <p class="about-text" style="margin-bottom:18px">
+      Replace the links below with your own. Delete any you don't use.
+    </p>
+    <div class="contact-row">
+      <a href="mailto:you@example.com">email</a>
+      <a href="https://github.com/">github</a>
+      <a href="https://twitter.com/">twitter</a>
+      <a href="https://t.me/">telegram</a>
+    </div>
+  </section>
+
+</main>
+
+<div class="wrap">
+  <footer>
+    <div><span class="dot"></span> XNEON OSINT — open source intelligence research</div>
+    <div class="right">&copy; <span id="year"></span> · public information only</div>
+  </footer>
+</div>
+
+<script>
+  document.getElementById("year").textContent = new Date().getFullYear();
+</script>
+
+</body>
+    </html>
